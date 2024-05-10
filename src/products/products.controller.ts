@@ -1,8 +1,10 @@
-import { BadRequestException, Body, Controller, Delete, Get, Inject, Param, Patch, Post, Query } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { catchError, firstValueFrom, lastValueFrom, timeout } from 'rxjs';
 import { PaginationDto } from 'src/common';
 import { PRODUCT_SERVICE } from 'src/config';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 /**
  * This will consume the products microservice
@@ -12,8 +14,12 @@ export class ProductsController {
   constructor(@Inject(PRODUCT_SERVICE) private readonly productsClient: ClientProxy) {}
 
   @Post()
-  createProduct() {
-      return 'createProduct';
+  createProduct(@Body() createProductDto: CreateProductDto) {
+      return this.productsClient.send({ cmd: 'create-product' }, createProductDto).pipe(
+        catchError((err) => {
+          throw new RpcException(err);
+        })
+      );
   }
 
   @Get()
@@ -21,6 +27,10 @@ export class ProductsController {
     return this.productsClient.send(
       { cmd: 'find-all-products' },
       paginationDto,
+    ).pipe(
+      catchError((err) => {
+        throw new RpcException(err);
+      })
     );
   }
 
@@ -45,16 +55,24 @@ export class ProductsController {
   }
 
   @Delete(':id')
-  deleteProduct(@Param('id') id: string) {
-    return 'deleteProduct';
+  deleteProduct(@Param('id', ParseIntPipe) id: number) {
+    return this.productsClient.send({ cmd: 'remove-product' }, {id}).pipe(
+      catchError((err) => {
+        throw new RpcException(err);
+      })
+    );
   }
 
   @Patch(':id')
   updateProduct(
-      @Param('id') id: string,
-      @Body() body: any
+      @Param('id', ParseIntPipe) id: number,
+      @Body() updateProductDto: UpdateProductDto
   ) {
-    return 'updateProduct (WIP)';
+    return this.productsClient.send({ cmd: 'update-product' }, {id, ...updateProductDto}).pipe(
+      catchError((err) => {
+        throw new RpcException(err);
+      })
+    );
   }
 
 }
