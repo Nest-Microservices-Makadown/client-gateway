@@ -1,6 +1,9 @@
 
 ## Gateway Cliente de Microservicios
 
+![objetivo](Objetivo.png)
+![objetivo-2](Objetivo-2.png)
+
 Repositorio parte de curso https://www.udemy.com/course/nestjs-microservicios
 del maestro Fernando Herrera.
 EXCELENTE!
@@ -28,6 +31,7 @@ $ npm run start:prod
 ## Documentos de ayuda
 
 - https://docs.nestjs.com/recipes/prisma
+- https://nats.io/
 
 
 ## Nest License
