@@ -21,8 +21,6 @@ async function bootstrap() {
   await app.listen(envs.PORT);
   
   logger.log(`Gateway ready on port ${envs.PORT}`);
-  logger.log('Microservices to reach are:')
-  logger.log(`-> Products on ${envs.PRODUCTS_MS_HOST} port ${envs.PRODUCTS_MS_PORT}`);
-  logger.log(`-> Orders on ${envs.ORDERS_MS_HOST} port ${envs.ORDERS_MS_PORT}`);
+  logger.log(`NATS server(s) available: [${envs.NATS_SERVERS}]`);
 }
 bootstrap();

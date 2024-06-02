@@ -2,7 +2,7 @@ import { BadRequestException, Body, Controller, Delete, Get, Inject, Param, Pars
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { catchError, firstValueFrom, lastValueFrom, timeout } from 'rxjs';
 import { PaginationDto } from 'src/common';
-import { PRODUCT_SERVICE } from 'src/config';
+import { NATS_SERVICE } from 'src/config';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
@@ -11,11 +11,11 @@ import { UpdateProductDto } from './dto/update-product.dto';
  */
 @Controller('products')
 export class ProductsController {
-  constructor(@Inject(PRODUCT_SERVICE) private readonly productsClient: ClientProxy) {}
+  constructor(@Inject(NATS_SERVICE) private readonly natsClient: ClientProxy) {}
 
   @Post()
   createProduct(@Body() createProductDto: CreateProductDto) {
-      return this.productsClient.send({ cmd: 'create-product' }, createProductDto).pipe(
+      return this.natsClient.send('create-product', createProductDto).pipe(
         catchError((err) => {
           throw new RpcException(err);
         })
@@ -24,8 +24,8 @@ export class ProductsController {
 
   @Get()
   findAllProducts(@Query() paginationDto: PaginationDto) {
-    return this.productsClient.send(
-      { cmd: 'find-all-products' },
+    return this.natsClient.send(
+      'find-all-products',
       paginationDto,
     ).pipe(
       catchError((err) => {
@@ -36,7 +36,7 @@ export class ProductsController {
 
   @Get(':id')
   async findOneProduct(@Param('id') id: string) {
-    return this.productsClient.send({ cmd: 'find-one-product' },{id},)
+    return this.natsClient.send('find-one-product',{id},)
     .pipe(
       catchError((err) => {
         throw new RpcException(err);
@@ -45,7 +45,7 @@ export class ProductsController {
     
     /*try {
       const product = await firstValueFrom(this.productsClient.send(
-                      { cmd: 'find-one-product' },
+                      'find-one-product',
                       {id},
                     ));
       return product;
@@ -56,7 +56,7 @@ export class ProductsController {
 
   @Delete(':id')
   deleteProduct(@Param('id', ParseIntPipe) id: number) {
-    return this.productsClient.send({ cmd: 'remove-product' }, {id}).pipe(
+    return this.natsClient.send('remove-product', {id}).pipe(
       catchError((err) => {
         throw new RpcException(err);
       })
@@ -68,7 +68,7 @@ export class ProductsController {
       @Param('id', ParseIntPipe) id: number,
       @Body() updateProductDto: UpdateProductDto
   ) {
-    return this.productsClient.send({ cmd: 'update-product' }, {id, ...updateProductDto}).pipe(
+    return this.natsClient.send('update-product', {id, ...updateProductDto}).pipe(
       catchError((err) => {
         throw new RpcException(err);
       })

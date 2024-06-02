@@ -1,17 +1,17 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, Query, ParseUUIDPipe, ParseEnumPipe } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
-import { ORDERS_SERVICE } from 'src/config';
+import { NATS_SERVICE } from 'src/config';
 import { catchError } from 'rxjs';
 import { CreateOrderDto, OrderPaginationDto, OrderStatus, StatusDto } from './dto';
 import { PaginationDto } from 'src/common';
 
 @Controller('orders')
 export class OrdersController {
-  constructor(@Inject(ORDERS_SERVICE) private readonly ordersClient: ClientProxy) {}
+  constructor(@Inject(NATS_SERVICE) private readonly natsClient: ClientProxy) {}
 
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersClient.send('createOrder', createOrderDto).pipe(
+    return this.natsClient.send('createOrder', createOrderDto).pipe(
       catchError((err) => {
         throw new RpcException(err);
       })
@@ -20,7 +20,7 @@ export class OrdersController {
 
   @Get()
   findAll(@Query() paginationDto: OrderPaginationDto) {
-    return this.ordersClient.send(
+    return this.natsClient.send(
        'findAllOrders',
       paginationDto,
     ).pipe(
@@ -32,7 +32,7 @@ export class OrdersController {
 
   @Get('id/:id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.ordersClient.send('findOneOrder',{id},)
+    return this.natsClient.send('findOneOrder',{id},)
     .pipe(
       catchError((err) => {
         throw new RpcException(err);
@@ -50,7 +50,7 @@ export class OrdersController {
       ...paginationDto
     };
 
-    return this.ordersClient.send('findAllOrders',orderPaginationDto)
+    return this.natsClient.send('findAllOrders',orderPaginationDto)
     .pipe(
       catchError((err) => {
         throw new RpcException(err);
@@ -63,7 +63,7 @@ export class OrdersController {
         @Param('id', ParseUUIDPipe) id: string,
         @Body() newStatusDto: StatusDto
   ) {    
-     return this.ordersClient.send('changeOrderStatus', {id, ...newStatusDto}).pipe(
+     return this.natsClient.send('changeOrderStatus', {id, ...newStatusDto}).pipe(
       catchError((err) => {
         throw new RpcException(err);
       })
