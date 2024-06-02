@@ -20,7 +20,6 @@ async function bootstrap() {
 
   await app.listen(envs.PORT);
   
-  logger.log(`Gateway ready on port ${envs.PORT}`);
-  logger.log(`NATS server(s) available: [${envs.NATS_SERVERS}]`);
+  logger.log(`Gateway is ready on port ${envs.PORT}`);
 }
 bootstrap();
