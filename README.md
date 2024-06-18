@@ -1,8 +1,6 @@
 
 ## Gateway Cliente de Microservicios
 
-![objetivo](Objetivo.png)
-![objetivo-2](Objetivo-2.png)
 
 Repositorio parte de curso https://www.udemy.com/course/nestjs-microservicios
 del maestro Fernando Herrera.
