@@ -1,9 +1,11 @@
-import { Body, Controller, Inject, Post } from "@nestjs/common";
+import { Body, Controller, Inject, Post, Req, UseGuards } from "@nestjs/common";
 import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { catchError } from "rxjs";
 import { NATS_SERVICE } from "src/config";
-import { CreateOrderDto } from "src/orders/dto";
 import { LoginUserDto, RegisterUserDto } from "./dto";
+import { AuthGuard } from "./guards/auth.guard";
+import { User, Token } from "./decorators";
+import { CurrentUser } from "./interfaces/current-user";
 
 @Controller('auth')
 export class AuthController {
@@ -27,14 +29,10 @@ export class AuthController {
       );
   }
 
+  @UseGuards(AuthGuard)
   @Post('verify')
-  verifyToken() {
-    return this.natsClient.send('auth.verify.user', {}).pipe(
-        catchError((err) => {
-          throw new RpcException(err);
-        })
-      );
+  verifyToken(@User() user: CurrentUser, @Token() token: string) {
+    // The Guard does all the work for us, so we can just return user and token
+    return {user, token};
   }
-
-  
 }
