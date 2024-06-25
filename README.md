@@ -52,3 +52,10 @@ http://localhost:8222/
 ## Nest License
 
 Nest is [MIT licensed](LICENSE).
+
+## PROD - Despues de crear dockerfile.prod
+
+Ejecutar
+```
+docker build -f dockerfile.prod -t client-gateway .
+```
